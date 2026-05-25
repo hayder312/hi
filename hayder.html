@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مفاجأة علي</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #111;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* حاوية الهوسة */
+        #chaos {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .ball {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 0.4s ease-in-out;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        /* النص النهائي اللي يجي من بعيد */
+        .final-text {
+            position: absolute;
+            font-size: 5rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 20px #fff, 0 0 40px #ff00ff, 0 0 60px #00ffff;
+            z-index: 10;
+            /* يبدأ صغير جداً ومخفي */
+            transform: scale(0);
+            opacity: 0;
+            transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* حركة مرنة (Elastic) */
+        }
+
+        /* الكلاس اللي يظهر النص */
+        .show-text {
+            transform: scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chaos"></div>
+
+    <div class="final-text" id="finalText">علي خوش ولد 😂</div>
+
+    <script>
+        const chaosDiv = document.getElementById('chaos');
+        const finalText = document.getElementById('finalText');
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+        const balls = [];
+
+        // 1. صناعة الهوسة (كرات ملونة)
+        for (let i = 0; i < 50; i++) {
+            let ball = document.createElement('div');
+            ball.className = 'ball';
+            let size = Math.random() * 40 + 10;
+            ball.style.width = size + 'px';
+            ball.style.height = size + 'px';
+            ball.style.color = colors[Math.floor(Math.random() * colors.length)];
+            ball.style.backgroundColor = 'currentColor';
+            ball.style.top = Math.random() * 100 + 'vh';
+            ball.style.left = Math.random() * 100 + 'vw';
+            chaosDiv.appendChild(ball);
+            balls.push(ball);
+        }
+
+        // 2. تحريك الهوسة بسرعة (يروح ويجي)
+        let chaosInterval = setInterval(() => {
+            balls.forEach(ball => {
+                ball.style.top = Math.random() * 100 + 'vh';
+                ball.style.left = Math.random() * 100 + 'vw';
+                ball.style.transform = `scale(${Math.random() * 2})`;
+            });
+        }, 400);
+
+        // 3. المفاجأة بعد 5 ثواني
+        setTimeout(() => {
+            // توقيف الهوسة وإخفائها
+            clearInterval(chaosInterval);
+            chaosDiv.style.opacity = '0';
+            chaosDiv.style.transition = 'opacity 1s';
+
+            // إظهار النص من بعيد ويكبر
+            finalText.classList.add('show-text');
+
+            // إطلاق فقاعات الاحتفال (Confetti)
+            setTimeout(() => {
+                var duration = 3000;
+                var end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 7,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: colors
+                    });
+                    confetti({
+                        particleCount: 7,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: colors
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            }, 500); // إطلاق الفقاعات بعد ما يبدأ النص يكبر بنصف ثانية
+
+        }, 5000); // مدة الهوسة 5 ثواني
+    </script>
+
+</body>
+</html>
